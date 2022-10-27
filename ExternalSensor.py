@@ -12,13 +12,13 @@ else:
 class ExternalSensor():
     def __init__(self, device):
         self.SerialPort = None
-        self.Serial_Number = '~No Board Found~'
-        self.Model_Number = '~No Board Found~'
+        self.Serial_Number = ''
+        self.Model_Number = ''
         self.Device_Type = 'Control'
         self.Sensor_Zero = ''
         self.Sensor_Fullscale = ''
-        self.Monitor_Zero = ''
-        self.Monitor_Fullscale = ''
+        self.Out_Zero = ''
+        self.Out_Fullscale = ''
         self.Waiting = False
 
         if device is not None:
@@ -29,11 +29,11 @@ class ExternalSensor():
             self.get_serialnumber()
             if not 'error' in self.Serial_Number:
                 self.get_all_values()
-                self.Serial_Number = '~No Board Found~'
+                self.Serial_Number = ''
         else:
             self.SerialPort = None
-            self.Serial_Number = '~No Board Found~'
-            self.Model_Number = '~No Board Found~'
+            self.Serial_Number = ''
+            self.Model_Number = ''
 
     def reset_serial(self):
         while self.Waiting:
@@ -102,36 +102,27 @@ class ExternalSensor():
         self.Serial_Number = r
         return r
 
-    def get_monitor(self):
+    def get_outzero(self):
         r = ''
-        if 'CS-5090' in self.Model_Number:
-            r = ''
-        else:
-            r = self.get_resp('MON')
-        self.Monitor = r
-        return r
-
-    def get_monitorzero(self):
-        r = ''
-        r = self.get_resp('MZERO')
+        r = self.get_resp('OUT_LOW')
         self.Monitor_Zero = r
         return r
 
-    def get_monitorfullscale(self):
+    def get_outfullscale(self):
         r = ''
-        r = self.get_resp('MFS')
+        r = self.get_resp('OUT_HIGH')
         self.Monitor_Fullscale = r
         return r
 
     def get_sensorzero(self):
         r = ''
-        r = self.get_resp('SZERO')
+        r = self.get_resp('SENSOR_LOW')
         self.Sensor_Zero = r
         return r
 
     def get_sensorfullscale(self):
         r = ''
-        r = self.get_resp('SFS')
+        r = self.get_resp('SENSOR_HIGH')
         self.Sensor_Fullscale = r
         return r
 
@@ -173,8 +164,8 @@ class ExternalSensor():
         else:
             return 1
 
-    def set_monitorzero(self, value):
-        cmd = 'MZERO'
+    def set_outzero(self, value):
+        cmd = 'OUT_LOW'
         retval = ''
         retval = self.set_value(cmd, value)
         self.Monitor_Zero = retval
@@ -183,8 +174,8 @@ class ExternalSensor():
         else:
             return 1
 
-    def set_monitorfullscale(self, value):
-        cmd = 'MFS'
+    def set_outfullscale(self, value):
+        cmd = 'OUT_HIGH'
         retval = ''
         retval = self.set_value(cmd, value)
         self.Monitor_Fullscale = retval
@@ -194,10 +185,20 @@ class ExternalSensor():
             return 1
 
     def set_sensorzero(self, value):
-        cmd = 'SZERO'
+        cmd = 'SENSOR_LOW'
         retval = ''
         retval = self.set_value(cmd, value)
         self.Sensor_Zero = retval
+        if retval == cmd:
+            return 0
+        else:
+            return 1
+
+    def set_sensorfullscale(self, value):
+        cmd = 'SENSOR_HIGH'
+        retval = ''
+        retval = self.set_value(cmd, value)
+        self.Sensor_Fullscale = retval
         if retval == cmd:
             return 0
         else:
@@ -217,20 +218,6 @@ class ExternalSensor():
             self.Waiting = False
             return 'error'
 
-    def auto_calibrate(self):
-        try:
-            # with serial.Serial(self.SerialPort, 57600, timeout=.5, write_timeout=.5) as ser:
-            while self.Waiting:
-                pass
-            self.Waiting = True
-            self.SerialPort.write(b'AUTOC\r')
-            resp = self.SerialPort.read_until(b'\r')
-            self.Waiting = False
-            return resp.decode('utf-8')
-        except:
-            self.Waiting = False
-            return 'error'
-
     def is_connected(self):
         # r = self.get_resp('ID')
         if self.SerialPort:
@@ -243,74 +230,36 @@ class ExternalSensor():
         self.get_serialnumber()
         if not 'error' in self.Serial_Number:
             self.get_id()
-            self.get_commandzero()
-            self.get_commandfullscale()
-            self.get_monitorzero()
-            self.get_monitorfullscale()
+            self.get_outzero()
+            self.get_outfullscale()
             self.get_sensorzero()
             self.get_sensorfullscale()
-            self.get_pidp()
-            self.get_pidi()
-            self.get_cutoff()
-            self.get_ibias()
-            self.get_monitor()
-            self.get_current_command()
-            if 'CS-5090' not in self.Model_Number:
-                self.get_command_type()
-                self.get_current_command()
-                self.get_vlo()
-                self.get_ebias()
-                self.get_flow()
-                self.get_status()
-                self.get_pidd()
-                self.get_firmware()
         else:
-            self.Serial_Number = '~No Board Found~'
+            self.Serial_Number = ''
 
     def empty_values(self):
-        self.Serial_Number = '~No Board Found~'
-        self.Model_Number = '~No Board Found~'
-        self.Command_Zero = ''
-        self.Command_Fullscale = ''
+        self.Serial_Number = ''
+        self.Model_Number = ''
         self.Sensor_Zero = ''
         self.Sensor_Fullscale = ''
-        self.Monitor_Zero = ''
-        self.Monitor_Fullscale = ''
-        self.PID_P = ''
-        self.PID_I = ''
-        self.PID_D = ''
-        self.Command_Type = ''
-        self.Current_Command = ''
-        self.VLO = ''
-        self.IBIAS = ''
-        self.EBIAS = ''
-        self.Flow = ''
-        self.Cutoff = ''
-        self.Monitor = ''
-        self.Command = ''
-        self.Firmware = ''
-        self.InletEnabled = True
-        self.ExhaustEnabled = True
+        self.Out_Zero = ''
+        self.Out_Fullscale = ''
 
     def update_values(self):
-        if 'CS-5090' not in self.Model_Number:
-            self.get_status()
+        self.get_status()
 
 
 if __name__ == '__main__':
     import time
-    Cordis = ExternalSensor()
-    print('ID: ' + Cordis.ID)
-    print('SN: ' + Cordis.SerialNumber)
-    print('PIDP: ' + Cordis.get_pidp())
-    print('PIDI: ' + Cordis.get_pidi())
-    print('PIDD: ' + Cordis.get_pidd())
-    print('CZERO: ' + Cordis.get_commandzero())
-    print('CFS: ' + Cordis.get_commandfullscale())
-    print('SZERO: ' + Cordis.get_sensorzero())
-    print('SFS: ' + Cordis.get_sensorfullscale())
-    print('CT: ' + Cordis.get_commandtype())
-    print('ADC: ' + Cordis.get_status())
+    Sensor = ExternalSensor()
+    print('ID: ' + Sensor.ID)
+    print('SN: ' + Sensor.SerialNumber)
+    print('CZERO: ' + Sensor.get_outzero())
+    print('CFS: ' + Sensor.get_outfullscale())
+    print('SZERO: ' + Sensor.get_sensorzero())
+    print('SFS: ' + Sensor.get_sensorfullscale())
+    print('CT: ' + Sensor.get_commandtype())
+    print('ADC: ' + Sensor.get_status())
     while 1:
-        print(Cordis.get_status())
+        print(Sensor.get_status())
         sleep(1)
