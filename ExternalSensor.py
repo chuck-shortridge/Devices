@@ -15,6 +15,7 @@ class ExternalSensor():
         self.Serial_Number = ''
         self.Model_Number = ''
         self.Device_Type = 'Control'
+        self.Output = ''
         self.Sensor_Zero = ''
         self.Sensor_Fullscale = ''
         self.Out_Zero = ''
@@ -129,20 +130,27 @@ class ExternalSensor():
     def get_status(self):
         r = ':  :  :'
         r = self.get_resp('STAT')
-        c = 'Err'
         s = 'Err'
-        e = 'Err'
-        if r.startswith(' C:'):
+        sl = 'Err'
+        sh = 'Err'
+        ol = 'Err'
+        oh = 'Err'
+        if r.startswith(': ADC::'):
             try:
                 r.lstrip()
-                c = r.split('  ')[0].split(':')[1]
-                s = r.split('  ')[1].split(':')[1]
-                e = r.split('  ')[2].split(':')[1]
+                s = r.split(' | ')[0].split('::')[1].strip()
+                sl = r.split(' | ')[1].split('::')[1].strip()
+                sh = r.split(' | ')[2].split('::')[1].strip()
+                ol = r.split(' | ')[3].split('::')[1].strip()
+                oh = r.split(' | ')[4].split('::')[1].strip()
             except Exception as ex:
                 pass
-        self.Command = str(c)
-        self.Monitor = str(s)
-        return c, s, e
+            self.Output = str(s)
+            self.Sensor_Zero = str(sl)
+            self.Sensor_Fullscale = str(sh)
+            self.Out_Zero = str(ol)
+            self.Out_Fullscale = str(oh)
+        return s, sl, sh, ol, oh
 
     def set_serialnumber(self, value):
         cmd = '53455249414C'
@@ -240,6 +248,7 @@ class ExternalSensor():
     def empty_values(self):
         self.Serial_Number = ''
         self.Model_Number = ''
+        self.Output = ''
         self.Sensor_Zero = ''
         self.Sensor_Fullscale = ''
         self.Out_Zero = ''
