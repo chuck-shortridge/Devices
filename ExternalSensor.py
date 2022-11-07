@@ -106,13 +106,13 @@ class ExternalSensor():
     def get_outzero(self):
         r = ''
         r = self.get_resp('OUT_LOW')
-        self.Monitor_Zero = r
+        self.Out_Zero = r
         return r
 
     def get_outfullscale(self):
         r = ''
         r = self.get_resp('OUT_HIGH')
-        self.Monitor_Fullscale = r
+        self.Out_Fullscale = r
         return r
 
     def get_sensorzero(self):
@@ -176,7 +176,7 @@ class ExternalSensor():
         cmd = 'OUT_LOW'
         retval = ''
         retval = self.set_value(cmd, value)
-        self.Monitor_Zero = retval
+        self.Out_Zero = retval
         if retval == cmd:
             return 0
         else:
@@ -186,7 +186,7 @@ class ExternalSensor():
         cmd = 'OUT_HIGH'
         retval = ''
         retval = self.set_value(cmd, value)
-        self.Monitor_Fullscale = retval
+        self.Out_Fullscale = retval
         if retval == cmd:
             return 0
         else:
