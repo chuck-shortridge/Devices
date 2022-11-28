@@ -1,7 +1,8 @@
+import platform
+from time import sleep, time
+
 import serial
 import serial.tools.list_ports
-from time import time, sleep
-import platform
 
 if platform.system().lower() != 'windows':
     import fcntl
